@@ -1,21 +1,33 @@
 import { useEffect, useState } from 'react'
-import { BookOpen, CalendarCheck, History, NotebookTabs, Settings, ShieldCheck, Users } from 'lucide-react'
+import { BookOpen, CalendarCheck, CalendarRange, FolderKanban, History, MoreHorizontal, NotebookTabs, Settings, ShieldCheck, Users } from 'lucide-react'
 import './App.css'
-import { createEmptyRecord, createId, getDateKey, getStudentColor, loadAgenda, saveAgenda, type AttendanceRecord, type Student } from './agenda'
+import { createEmptyRecord, createId, createStudentDetails, getDateKey, getStudentColor, loadAgenda, saveAgenda, type AttendanceRecord, type Student, type StudentEntry } from './agenda'
 import HistoryView from './components/HistoryView'
 import LibraryView, { type BookInput } from './components/LibraryView'
+import OrganizationView, { type FamilyMeetingInput } from './components/OrganizationView'
 import SettingsView from './components/SettingsView'
-import StudentsView, { type StudentInput } from './components/StudentsView'
+import StudentDossiersView, { type StudentInput } from './components/StudentDossiersView'
 import TodayView from './components/TodayView'
+import YearView, { type SchoolEventInput } from './components/YearView'
 
-type View = 'today' | 'students' | 'library' | 'history' | 'settings'
+type View = 'today' | 'year' | 'students' | 'organization' | 'library' | 'history' | 'settings' | 'more'
 
 const navigation: Array<{ id: View; label: string; icon: typeof CalendarCheck }> = [
   { id: 'today', label: 'Σήμερα', icon: CalendarCheck },
+  { id: 'year', label: 'Σχολικό έτος', icon: CalendarRange },
   { id: 'students', label: 'Μαθητές', icon: Users },
+  { id: 'organization', label: 'Οργάνωση', icon: FolderKanban },
   { id: 'library', label: 'Βιβλιοθήκη', icon: BookOpen },
   { id: 'history', label: 'Ιστορικό', icon: History },
   { id: 'settings', label: 'Ρυθμίσεις', icon: Settings },
+]
+
+const mobileNavigation: Array<{ id: View; label: string; icon: typeof CalendarCheck }> = [
+  { id: 'today', label: 'Σήμερα', icon: CalendarCheck },
+  { id: 'year', label: 'Έτος', icon: CalendarRange },
+  { id: 'students', label: 'Μαθητές', icon: Users },
+  { id: 'library', label: 'Βιβλία', icon: BookOpen },
+  { id: 'more', label: 'Περισσότερα', icon: MoreHorizontal },
 ]
 
 function App() {
@@ -46,6 +58,7 @@ function App() {
     setData((current) => ({
       ...current,
       students: [...current.students, {
+        ...createStudentDetails(current.classroom.name),
         ...student,
         id: createId(),
         color: getStudentColor(current.students.length),
@@ -59,6 +72,10 @@ function App() {
       ...current,
       students: current.students.map((student) => student.id === studentId ? { ...student, ...patch } : student),
     }))
+  }
+
+  function addStudentEntry(entry: Omit<StudentEntry, 'id'>) {
+    setData((current) => ({ ...current, studentEntries: [...current.studentEntries, { ...entry, id: createId() }] }))
   }
 
   function addBook(book: BookInput) {
@@ -82,8 +99,32 @@ function App() {
     }))
   }
 
+  function addSchoolEvent(event: SchoolEventInput) {
+    setData((current) => ({ ...current, schoolEvents: [...current.schoolEvents, { ...event, id: createId() }] }))
+  }
+
+  function deleteSchoolEvent(eventId: string) {
+    setData((current) => ({ ...current, schoolEvents: current.schoolEvents.filter((event) => event.id !== eventId) }))
+  }
+
+  function addFamilyMeeting(meeting: FamilyMeetingInput) {
+    setData((current) => ({ ...current, familyMeetings: [...current.familyMeetings, { ...meeting, id: createId() }] }))
+  }
+
+  function deleteFamilyMeeting(meetingId: string) {
+    setData((current) => ({ ...current, familyMeetings: current.familyMeetings.filter((meeting) => meeting.id !== meetingId) }))
+  }
+
   function clearClassroom() {
-    setData((current) => ({ ...current, students: [], attendance: [], books: [] }))
+    setData((current) => ({
+      ...current,
+      students: [],
+      attendance: [],
+      books: [],
+      schoolEvents: [],
+      familyMeetings: [],
+      studentEntries: [],
+    }))
   }
 
   const selectedLabel = new Intl.DateTimeFormat('el-GR', {
@@ -144,18 +185,30 @@ function App() {
             onUpdateAttendance={updateAttendance}
           />
         )}
-        {activeView === 'students' && <StudentsView students={data.students} books={data.books} onAddStudent={addStudent} onUpdateStudent={updateStudent} />}
+        {activeView === 'year' && <YearView classroom={data.classroom} students={data.students} events={data.schoolEvents} onAddEvent={addSchoolEvent} onDeleteEvent={deleteSchoolEvent} />}
+        {activeView === 'students' && <StudentDossiersView students={data.students} books={data.books} entries={data.studentEntries} onAddStudent={addStudent} onUpdateStudent={updateStudent} onAddEntry={addStudentEntry} />}
+        {activeView === 'organization' && <OrganizationView classroom={data.classroom} students={data.students} attendance={data.attendance} meetings={data.familyMeetings} selectedDate={selectedDate} onAddMeeting={addFamilyMeeting} onDeleteMeeting={deleteFamilyMeeting} />}
         {activeView === 'library' && <LibraryView books={data.books} students={data.students} onAddBook={addBook} onLoanBook={loanBook} onReturnBook={returnBook} />}
         {activeView === 'history' && <HistoryView students={data.students} records={data.attendance} selectedDate={selectedDate} onDateChange={setSelectedDate} />}
         {activeView === 'settings' && <SettingsView data={data} onUpdateClassroom={(classroom) => setData((current) => ({ ...current, classroom }))} onImport={setData} onClear={clearClassroom} />}
+        {activeView === 'more' && (
+          <section className="agenda-view more-view">
+            <div className="view-heading"><div><span className="eyebrow">Εργαλεία τάξης</span><h1>Περισσότερα</h1><p>Αρχείο, οικογένειες, εκτυπώσεις και ρυθμίσεις.</p></div></div>
+            <div className="more-grid">
+              <button type="button" onClick={() => setActiveView('organization')}><span><FolderKanban size={23} /></span><strong>Οργάνωση</strong><small>Συναντήσεις οικογενειών και εκτυπώσεις</small></button>
+              <button type="button" onClick={() => setActiveView('history')}><span><History size={23} /></span><strong>Ιστορικό</strong><small>Παρουσίες και σημειώσεις ανά ημέρα</small></button>
+              <button type="button" onClick={() => setActiveView('settings')}><span><Settings size={23} /></span><strong>Ρυθμίσεις</strong><small>Στοιχεία τάξης και αντίγραφα δεδομένων</small></button>
+            </div>
+          </section>
+        )}
       </main>
 
       <nav className="mobile-navigation" aria-label="Κύρια πλοήγηση κινητού">
-        {navigation.map(({ id, label, icon: Icon }) => (
+        {mobileNavigation.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             type="button"
-            className={activeView === id ? 'active' : ''}
+            className={activeView === id || (id === 'more' && ['organization', 'history', 'settings'].includes(activeView)) ? 'active' : ''}
             aria-label={label}
             onClick={() => setActiveView(id)}
           >

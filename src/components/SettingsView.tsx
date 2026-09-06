@@ -17,9 +17,13 @@ export default function SettingsView({ data, onUpdateClassroom, onImport, onClea
   function saveClassroom(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     onUpdateClassroom({
+      ...classroom,
       name: classroom.name.trim(),
       schoolYear: classroom.schoolYear.trim(),
       teacherName: classroom.teacherName.trim(),
+      schoolName: classroom.schoolName.trim(),
+      schoolEmail: classroom.schoolEmail.trim(),
+      schoolPhone: classroom.schoolPhone.trim(),
     })
     setSaved(true)
   }
@@ -47,7 +51,7 @@ export default function SettingsView({ data, onUpdateClassroom, onImport, onClea
   }
 
   function clearClassroom() {
-    if (!window.confirm('Να διαγραφούν όλοι οι μαθητές, οι παρουσίες και τα βιβλία από αυτή τη συσκευή;')) return
+    if (!window.confirm('Να διαγραφούν όλοι οι μαθητές, οι παρουσίες, τα βιβλία, οι συναντήσεις και οι καταγραφές από αυτή τη συσκευή;')) return
     onClear()
     setImportMessage('Η τάξη είναι πλέον κενή.')
   }
@@ -59,10 +63,20 @@ export default function SettingsView({ data, onUpdateClassroom, onImport, onClea
         <section className="settings-section">
           <div className="settings-section-heading"><span><Settings size={20} /></span><div><h2>Στοιχεία τάξης</h2><p>Εμφανίζονται στην κορυφή της εφαρμογής.</p></div></div>
           <form className="settings-form" onSubmit={saveClassroom}>
+            <label>Όνομα σχολείου<input required value={classroom.schoolName} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, schoolName: event.target.value }) }} /></label>
             <label>Όνομα τμήματος<input required value={classroom.name} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, name: event.target.value }) }} /></label>
             <div className="form-row">
               <label>Σχολική χρονιά<input required value={classroom.schoolYear} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, schoolYear: event.target.value }) }} /></label>
               <label>Εκπαιδευτικός<input required value={classroom.teacherName} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, teacherName: event.target.value }) }} /></label>
+            </div>
+            <div className="form-row">
+              <label>Έναρξη μαθημάτων<input required type="date" value={classroom.startDate} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, startDate: event.target.value }) }} /></label>
+              <label>Λήξη μαθημάτων<input required type="date" value={classroom.endDate} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, endDate: event.target.value }) }} /></label>
+            </div>
+            <label>Ημέρες διδασκαλίας<input required type="number" min="1" max="366" value={classroom.teachingDays} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, teachingDays: Number(event.target.value) }) }} /></label>
+            <div className="form-row">
+              <label>Email σχολείου<input type="email" value={classroom.schoolEmail} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, schoolEmail: event.target.value }) }} /></label>
+              <label>Τηλέφωνο σχολείου<input type="tel" value={classroom.schoolPhone} onChange={(event) => { setSaved(false); setClassroom({ ...classroom, schoolPhone: event.target.value }) }} /></label>
             </div>
             <button type="submit" className="button primary">{saved ? <Check size={18} /> : <Settings size={18} />}{saved ? 'Αποθηκεύτηκε' : 'Αποθήκευση στοιχείων'}</button>
           </form>
@@ -76,7 +90,7 @@ export default function SettingsView({ data, onUpdateClassroom, onImport, onClea
           </div>
           {importMessage && <p className="settings-message" role="status">{importMessage}</p>}
           <div className="danger-zone">
-            <div><strong>Καθαρισμός τάξης</strong><span>Διαγράφει τα δοκιμαστικά και καταχωρισμένα δεδομένα μόνο από αυτή τη συσκευή.</span></div>
+            <div><strong>Καθαρισμός τάξης</strong><span>Διαγράφει τα δεδομένα τάξης από αυτή τη συσκευή, διατηρώντας μόνο τα στοιχεία σχολείου.</span></div>
             <button type="button" className="button danger" onClick={clearClassroom}><Eraser size={18} /> Καθαρισμός</button>
           </div>
         </section>
