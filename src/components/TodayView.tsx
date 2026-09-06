@@ -6,11 +6,13 @@ import {
   ChevronRight,
   Clock3,
   LogOut,
+  Pencil,
   RotateCcw,
   Search,
   StickyNote,
   Stethoscope,
   UserX,
+  X,
 } from 'lucide-react'
 import { createEmptyRecord, type AttendanceRecord, type Book, type Student } from '../agenda'
 
@@ -51,6 +53,47 @@ function initials(name: string) {
   return name.split(' ').slice(0, 2).map((part) => part[0]).join('')
 }
 
+function TimeEditorDialog({ studentName, record, onClose, onSave }: {
+  studentName: string
+  record: AttendanceRecord
+  onClose: () => void
+  onSave: (arrivedAt: string, departedAt: string | null) => void
+}) {
+  const [arrivedAt, setArrivedAt] = useState(record.arrivedAt ?? '')
+  const [departedAt, setDepartedAt] = useState(record.departedAt ?? '')
+  const [error, setError] = useState('')
+
+  return (
+    <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="dialog small time-editor-dialog" role="dialog" aria-modal="true" aria-labelledby="time-editor-title">
+        <div className="dialog-heading">
+          <div><span className="eyebrow">{studentName}</span><h2 id="time-editor-title">Διόρθωση ωρών</h2></div>
+          <button type="button" className="icon-button" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={onClose}><X size={20} /></button>
+        </div>
+        <form className="dialog-form" onSubmit={(event) => {
+          event.preventDefault()
+          if (departedAt && departedAt <= arrivedAt) {
+            setError('Η αναχώρηση πρέπει να είναι μετά την άφιξη.')
+            return
+          }
+          onSave(arrivedAt, departedAt || null)
+        }}>
+          <div className="form-row">
+            <label>Ώρα άφιξης<input autoFocus required type="time" value={arrivedAt} onChange={(event) => { setArrivedAt(event.target.value); setError('') }} /></label>
+            <label>Ώρα αναχώρησης<input type="time" value={departedAt} aria-invalid={Boolean(error)} aria-describedby={error ? 'time-editor-error' : undefined} onChange={(event) => { setDepartedAt(event.target.value); setError('') }} /></label>
+          </div>
+          {error && <p className="time-editor-error" id="time-editor-error" role="alert">{error}</p>}
+          <p className="time-editor-hint">Άφησε κενή την αναχώρηση αν το παιδί βρίσκεται ακόμη στην τάξη.</p>
+          <div className="dialog-actions">
+            <button type="button" className="button secondary" onClick={onClose}>Ακύρωση</button>
+            <button type="submit" className="button primary">Αποθήκευση</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  )
+}
+
 export default function TodayView({
   students,
   records,
@@ -61,6 +104,7 @@ export default function TodayView({
 }: TodayViewProps) {
   const [query, setQuery] = useState('')
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null)
+  const [timeEditor, setTimeEditor] = useState<{ studentName: string; record: AttendanceRecord } | null>(null)
   const activeStudents = students.filter((student) => student.active)
   const dayRecords = records.filter((record) => record.date === selectedDate)
   const visibleStudents = activeStudents.filter((student) =>
@@ -129,6 +173,7 @@ export default function TodayView({
                   <div className="student-meta">
                     {record.arrivedAt && <span><Clock3 size={14} /> Άφιξη {record.arrivedAt}</span>}
                     {record.departedAt && <span><LogOut size={14} /> Αναχώρηση {record.departedAt}</span>}
+                    {(record.arrivedAt || record.departedAt) && <button type="button" className="edit-times-button" title="Διόρθωση ωρών" aria-label={`Διόρθωση ωρών για ${student.fullName}`} onClick={() => setTimeEditor({ studentName: student.fullName, record })}><Pencil size={13} /></button>}
                     {activeLoans.length > 0 && <span><BookOpen size={14} /> {activeLoans.length} {activeLoans.length === 1 ? 'βιβλίο' : 'βιβλία'}</span>}
                     {record.note && <span><StickyNote size={14} /> Σημείωση</span>}
                   </div>
@@ -245,6 +290,14 @@ export default function TodayView({
           )
         })}
       </div>
+      {timeEditor && <TimeEditorDialog studentName={timeEditor.studentName} record={timeEditor.record} onClose={() => setTimeEditor(null)} onSave={(arrivedAt, departedAt) => {
+        onUpdateAttendance(timeEditor.record.studentId, timeEditor.record.date, {
+          arrivedAt,
+          departedAt,
+          status: departedAt ? 'departed' : 'present',
+        })
+        setTimeEditor(null)
+      }} />}
     </section>
   )
 }

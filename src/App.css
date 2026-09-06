@@ -513,6 +513,24 @@
   gap: 5px;
 }
 
+.edit-times-button {
+  width: 27px;
+  height: 27px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  color: #6756ad;
+  background: var(--lavender-soft);
+  border: 1px solid #d9cfed;
+  border-radius: 50%;
+}
+
+.edit-times-button:hover {
+  color: #fff;
+  background: #6756ad;
+  border-color: #6756ad;
+}
+
 .attendance-actions {
   display: flex;
   align-items: center;
@@ -1136,6 +1154,19 @@
   margin-top: 5px;
   padding-top: 17px;
   border-top: 1px solid var(--line);
+}
+
+.time-editor-hint {
+  margin: -5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.time-editor-error {
+  margin: -5px 0 0;
+  color: #a64131;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .book-row {
@@ -3327,6 +3358,7 @@
   .student-avatar { width: 42px; height: 42px; flex-basis: 42px; }
   .student-name-row h2 { font-size: 15px; }
   .student-meta { gap: 4px 9px; }
+  .edit-times-button { width: 36px; height: 36px; }
   .profile-details > div { grid-template-columns: 95px minmax(0, 1fr); }
   .form-row { grid-template-columns: 1fr; }
   .dialog { padding: 19px 16px; }
