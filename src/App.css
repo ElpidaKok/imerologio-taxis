@@ -3392,6 +3392,8 @@
   .data-actions .button { width: 100%; }
   .danger-zone { align-items: flex-start; flex-direction: column; }
   .year-calendar-grid { grid-template-columns: 1fr; }
+  .calendar-days > span,
+  .calendar-days > button { min-height: 34px; }
   .year-stat-grid article { min-height: 88px; padding: 13px; }
   .year-stat-grid strong { font-size: 16px; }
   .form-row.three-fields { grid-template-columns: 1fr; }
