@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['app-icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Ημερολόγιο Τάξης',
-        short_name: 'Ημερολόγιο',
-        description: 'Η καθημερινή ατζέντα του εκπαιδευτικού.',
+        name: 'agenda',
+        short_name: 'agenda',
+        description: 'Η ψηφιακή agenda του εκπαιδευτικού.',
         lang: 'el',
         start_url: './',
         scope: './',

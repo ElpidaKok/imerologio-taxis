@@ -40,7 +40,7 @@ export default function CoverView({ classroom, studentCount, eventCount, onOpenA
         <div className="cover-content">
           <span className="cover-year">{classroom.schoolYear}</span>
           <div className="cover-seal" aria-hidden="true"><GraduationCap /></div>
-          <p className="cover-script">Ημερολόγιο Τάξης</p>
+          <p className="cover-script">agenda</p>
           <h1 id="cover-title">Ατζέντα<br />Εκπαιδευτικού</h1>
           <p className="cover-owner">{classroom.teacherName}</p>
           <p className="cover-school">{classroom.schoolName} · {classroom.name}</p>

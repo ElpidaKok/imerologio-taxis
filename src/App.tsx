@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BookMarked, BookOpen, CalendarCheck, CalendarRange, FolderKanban, History, MoreHorizontal, NotebookTabs, Settings, ShieldCheck, Users } from 'lucide-react'
+import { BookMarked, BookOpen, CalendarCheck, CalendarRange, FolderKanban, GraduationCap, History, MoreHorizontal, Settings, ShieldCheck, Users } from 'lucide-react'
 import './App.css'
 import { createEmptyRecord, createId, createStudentDetails, getDateKey, getStudentColor, loadAgenda, saveAgenda, type AttendanceRecord, type Student, type StudentEntry } from './agenda'
 import CoverView from './components/CoverView'
@@ -142,8 +142,8 @@ function App() {
       </div>
       <aside className="sidebar">
         <button type="button" className="brand" aria-label="Μετάβαση στο εξώφυλλο" onClick={() => setActiveView('cover')}>
-          <span className="brand-mark" aria-hidden="true"><NotebookTabs size={23} /></span>
-          <span><strong>Ημερολόγιο</strong><small>τάξης</small></span>
+          <span className="brand-mark" aria-hidden="true"><GraduationCap size={24} /></span>
+          <span><strong>agenda</strong></span>
         </button>
 
         <nav className="side-navigation" aria-label="Κύρια πλοήγηση">

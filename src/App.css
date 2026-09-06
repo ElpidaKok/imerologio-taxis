@@ -35,10 +35,9 @@
   flex: 0 0 42px;
   display: grid;
   place-items: center;
-  color: #173d38;
-  background: #f3c35e;
-  border-radius: 7px;
-  transform: rotate(-2deg);
+  color: #fffdf8;
+  background: #6756ad;
+  border-radius: 50%;
 }
 
 .brand > span:last-child {
@@ -2187,10 +2186,10 @@
 }
 
 .brand-mark {
-  color: #4c4381;
-  background: #f4c866;
-  border: 2px solid rgba(255, 255, 255, 0.86);
-  box-shadow: 0 4px 0 rgba(126, 103, 55, 0.12);
+  color: #fffdf8;
+  background: #6756ad;
+  border: 3px solid #d9d2ef;
+  box-shadow: 0 0 0 1px #8f83bc, 0 4px 0 rgba(72, 60, 108, 0.14);
 }
 
 .brand strong {
