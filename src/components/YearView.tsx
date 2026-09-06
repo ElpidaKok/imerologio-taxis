@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { CalendarDays, Cake, Flag, GraduationCap, Palmtree, Plus, Trash2, X } from 'lucide-react'
+import { CalendarDays, Cake, Flag, GraduationCap, Palmtree, Plus, Star, Trash2, X } from 'lucide-react'
 import type { AgendaData, SchoolEvent, SchoolEventKind, Student } from '../agenda'
 
 export type SchoolEventInput = Omit<SchoolEvent, 'id'>
@@ -15,6 +15,7 @@ type YearViewProps = {
 const weekdays = ['Δ', 'Τ', 'Τ', 'Π', 'Π', 'Σ', 'Κ']
 
 const eventLabels: Record<SchoolEventKind, string> = {
+  important: 'Σημαντική ημερομηνία',
   holiday: 'Αργία',
   break: 'Διακοπές',
   birthday: 'Γενέθλια',
@@ -64,7 +65,7 @@ function birthdayDates(students: Student[], startDate: string, endDate: string) 
   })
 }
 
-function MiniCalendar({ month, markedDates }: { month: Date; markedDates: Map<string, string> }) {
+function MiniCalendar({ month, markedDates, minDate, maxDate, onSelectDate }: { month: Date; markedDates: Map<string, string>; minDate: string; maxDate: string; onSelectDate: (date: string) => void }) {
   const year = month.getFullYear()
   const monthIndex = month.getMonth()
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
@@ -81,18 +82,20 @@ function MiniCalendar({ month, markedDates }: { month: Date; markedDates: Map<st
           if (!day) return <span key={`empty-${index}`} />
           const key = dateKey(new Date(year, monthIndex, day, 12))
           const marker = markedDates.get(key)
-          return <span key={key} className={marker ? `marked ${marker}` : ''} title={marker ? key : undefined}>{day}</span>
+          const selectable = key >= minDate && key <= maxDate
+          const label = new Intl.DateTimeFormat('el-GR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(year, monthIndex, day, 12))
+          return <button type="button" key={key} className={marker ? `marked ${marker}` : ''} disabled={!selectable} title={selectable ? 'Προσθήκη σημαντικής ημερομηνίας' : undefined} aria-label={selectable ? `Προσθήκη σημαντικής ημερομηνίας στις ${label}` : label} onClick={() => onSelectDate(key)}>{day}</button>
         })}
       </div>
     </article>
   )
 }
 
-function EventDialog({ defaultDate, onClose, onSave }: { defaultDate: string; onClose: () => void; onSave: (event: SchoolEventInput) => void }) {
+function EventDialog({ defaultDate, minDate, maxDate, onClose, onSave }: { defaultDate: string; minDate: string; maxDate: string; onClose: () => void; onSave: (event: SchoolEventInput) => void }) {
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState(defaultDate)
   const [endDate, setEndDate] = useState('')
-  const [kind, setKind] = useState<SchoolEventKind>('school')
+  const [kind, setKind] = useState<SchoolEventKind>('important')
   const [notes, setNotes] = useState('')
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -104,14 +107,14 @@ function EventDialog({ defaultDate, onClose, onSave }: { defaultDate: string; on
     <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="dialog small" role="dialog" aria-modal="true" aria-labelledby="event-dialog-title">
         <div className="dialog-heading">
-          <div><span className="eyebrow">Σχολικό ημερολόγιο</span><h2 id="event-dialog-title">Νέο γεγονός</h2></div>
+          <div><span className="eyebrow">Ετήσιο ημερολόγιο</span><h2 id="event-dialog-title">Νέα σημαντική ημερομηνία</h2></div>
           <button type="button" className="icon-button" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={onClose}><X size={20} /></button>
         </div>
         <form className="dialog-form" onSubmit={submit}>
           <label>Τίτλος<input required autoFocus value={title} onChange={(event) => setTitle(event.target.value)} /></label>
           <div className="form-row">
-            <label>Ημερομηνία<input required type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label>
-            <label>Έως (προαιρετικό)<input type="date" min={startDate} value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label>
+            <label>Ημερομηνία<input required type="date" min={minDate} max={maxDate} value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label>
+            <label>Έως (προαιρετικό)<input type="date" min={startDate} max={maxDate} value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label>
           </div>
           <label>Τύπος<select value={kind} onChange={(event) => setKind(event.target.value as SchoolEventKind)}>{Object.entries(eventLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           <label>Σημειώσεις<textarea rows={3} value={notes} onChange={(event) => setNotes(event.target.value)} /></label>
@@ -123,12 +126,17 @@ function EventDialog({ defaultDate, onClose, onSave }: { defaultDate: string; on
 }
 
 export default function YearView({ classroom, students, events, onAddEvent, onDeleteEvent }: YearViewProps) {
-  const [showDialog, setShowDialog] = useState(false)
+  const [eventDate, setEventDate] = useState<string | null>(null)
   const months = getSchoolMonths(classroom.startDate, classroom.endDate)
   const birthdays = birthdayDates(students, classroom.startDate, classroom.endDate)
   const markedDates = new Map<string, string>()
   events.forEach((event) => markedDates.set(event.startDate, event.kind))
-  birthdays.forEach((birthday) => markedDates.set(birthday.date, 'birthday'))
+  birthdays.forEach((birthday) => {
+    if (!markedDates.has(birthday.date)) markedDates.set(birthday.date, 'birthday')
+  })
+
+  const today = dateKey(new Date())
+  const defaultEventDate = today >= classroom.startDate && today <= classroom.endDate ? today : classroom.startDate
 
   const timeline = [
     ...events.map((event) => ({ id: event.id, date: event.startDate, title: event.title, kind: event.kind, detail: event.endDate ? `έως ${formatDate(event.endDate)}` : event.notes, removable: true })),
@@ -139,7 +147,7 @@ export default function YearView({ classroom, students, events, onAddEvent, onDe
     <section className="agenda-view year-view">
       <div className="view-heading">
         <div><span className="eyebrow">Η χρονιά με μία ματιά</span><h1>Σχολικό έτος {classroom.schoolYear}</h1><p>{classroom.schoolName} · {classroom.name}</p></div>
-        <button type="button" className="button primary" onClick={() => setShowDialog(true)}><Plus size={18} /> Νέο γεγονός</button>
+        <button type="button" className="button primary" onClick={() => setEventDate(defaultEventDate)}><Plus size={18} /> Σημαντική ημερομηνία</button>
       </div>
 
       <div className="year-stat-grid">
@@ -151,8 +159,8 @@ export default function YearView({ classroom, students, events, onAddEvent, onDe
 
       <div className="year-layout">
         <section className="year-calendar-panel">
-          <div className="section-title"><div><h2>Ετήσιο ημερολόγιο</h2><p>Αργίες, σχολικά γεγονότα και γενέθλια.</p></div><div className="calendar-legend"><span className="holiday">Αργία</span><span className="school">Σχολείο</span><span className="birthday">Γενέθλια</span></div></div>
-          <div className="year-calendar-grid">{months.map((month) => <MiniCalendar key={`${month.getFullYear()}-${month.getMonth()}`} month={month} markedDates={markedDates} />)}</div>
+          <div className="section-title"><div><h2>Ετήσιο ημερολόγιο</h2><p>Αργίες, σχολικά γεγονότα και γενέθλια.</p></div><div className="calendar-legend"><span className="important">Σημαντική</span><span className="holiday">Αργία</span><span className="school">Σχολείο</span><span className="birthday">Γενέθλια</span></div></div>
+          <div className="year-calendar-grid">{months.map((month) => <MiniCalendar key={`${month.getFullYear()}-${month.getMonth()}`} month={month} markedDates={markedDates} minDate={classroom.startDate} maxDate={classroom.endDate} onSelectDate={setEventDate} />)}</div>
         </section>
 
         <aside className="year-timeline-panel">
@@ -160,7 +168,7 @@ export default function YearView({ classroom, students, events, onAddEvent, onDe
           <div className="year-timeline">
             {timeline.map((item) => (
               <article key={item.id}>
-                <span className={`timeline-icon ${item.kind}`}>{item.kind === 'birthday' ? <Cake size={17} /> : <CalendarDays size={17} />}</span>
+                <span className={`timeline-icon ${item.kind}`}>{item.kind === 'birthday' ? <Cake size={17} /> : item.kind === 'important' ? <Star size={17} /> : <CalendarDays size={17} />}</span>
                 <div><time>{formatDate(item.date)}</time><strong>{item.title}</strong>{item.detail && <small>{item.detail}</small>}</div>
                 {item.removable && <button type="button" className="icon-button" title="Διαγραφή γεγονότος" aria-label={`Διαγραφή ${item.title}`} onClick={() => onDeleteEvent(item.id)}><Trash2 size={15} /></button>}
               </article>
@@ -169,7 +177,7 @@ export default function YearView({ classroom, students, events, onAddEvent, onDe
         </aside>
       </div>
 
-      {showDialog && <EventDialog defaultDate={classroom.startDate} onClose={() => setShowDialog(false)} onSave={(event) => { onAddEvent(event); setShowDialog(false) }} />}
+      {eventDate && <EventDialog defaultDate={eventDate} minDate={classroom.startDate} maxDate={classroom.endDate} onClose={() => setEventDate(null)} onSave={(event) => { onAddEvent(event); setEventDate(null) }} />}
     </section>
   )
 }

@@ -4,7 +4,7 @@ export type AbsenceReason = 'illness' | 'other' | null
 
 export type StudentSection = 'academic' | 'behavior' | 'support' | 'health'
 
-export type SchoolEventKind = 'holiday' | 'break' | 'birthday' | 'meeting' | 'school'
+export type SchoolEventKind = 'important' | 'holiday' | 'break' | 'birthday' | 'meeting' | 'school'
 
 export type Student = {
   id: string

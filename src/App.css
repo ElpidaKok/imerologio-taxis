@@ -1583,6 +1583,7 @@
 
 .calendar-legend .holiday::before { background: var(--coral); }
 .calendar-legend .birthday::before { background: var(--gold); }
+.calendar-legend .important::before { background: #7d70bc; }
 
 .year-calendar-grid {
   display: grid;
@@ -1631,31 +1632,52 @@
   font-weight: 800;
 }
 
-.calendar-days span {
+.calendar-days > span,
+.calendar-days > button {
   position: relative;
   min-height: 24px;
   display: grid;
   place-items: center;
+  padding: 0;
   color: #4c5753;
+  background: transparent;
+  border: 0;
   font-size: 9px;
   border-radius: 4px;
 }
 
-.calendar-days span:nth-child(7n),
-.calendar-days span:nth-child(7n - 1) {
+.calendar-days > :nth-child(7n),
+.calendar-days > :nth-child(7n - 1) {
   color: #a06a60;
 }
 
-.calendar-days span.marked {
+.calendar-days button {
+  cursor: pointer;
+}
+
+.calendar-days button:not(:disabled):hover,
+.calendar-days button:not(:disabled):focus-visible {
+  color: #55469a;
+  background: var(--lavender-soft);
+  outline: 1px solid #8c78c4;
+}
+
+.calendar-days button:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.calendar-days button.marked {
   color: #fff;
   background: var(--forest-2);
   font-weight: 800;
 }
 
-.calendar-days span.marked.holiday,
-.calendar-days span.marked.break { background: var(--coral); }
-.calendar-days span.marked.birthday { color: #513b0d; background: #f3c35e; }
-.calendar-days span.marked.meeting { background: var(--blue); }
+.calendar-days button.marked.holiday,
+.calendar-days button.marked.break { background: var(--coral); }
+.calendar-days button.marked.birthday { color: #513b0d; background: #f3c35e; }
+.calendar-days button.marked.meeting { background: var(--blue); }
+.calendar-days button.marked.important { background: #7d70bc; }
 
 .year-timeline {
   display: grid;
@@ -1689,6 +1711,7 @@
 .timeline-icon.break { color: var(--coral); background: var(--coral-soft); }
 .timeline-icon.birthday { color: #8b620f; background: var(--gold-soft); }
 .timeline-icon.meeting { color: var(--blue); background: var(--blue-soft); }
+.timeline-icon.important { color: #6756ad; background: var(--lavender-soft); }
 
 .year-timeline article > div {
   min-width: 0;
@@ -2530,11 +2553,12 @@
   box-shadow: 2px 3px 0 rgba(83, 72, 116, 0.04);
 }
 
-.calendar-days span.marked {
+.calendar-days button.marked {
   background: #5eae9b;
 }
 
-.calendar-days span.marked.meeting { background: #7d70bc; }
+.calendar-days button.marked.meeting,
+.calendar-days button.marked.important { background: #7d70bc; }
 
 .timeline-icon {
   color: #4c927f;
