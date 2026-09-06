@@ -32,7 +32,7 @@ export default function CoverView({ classroom, studentCount, eventCount, onOpenA
     <section className="cover-view" aria-labelledby="cover-title">
       <article className="cover-notebook">
         <div className="cover-spiral" aria-hidden="true">
-          {Array.from({ length: 12 }, (_, index) => <span key={index} />)}
+          {Array.from({ length: 14 }, (_, index) => <span key={index} />)}
         </div>
         <div className="cover-tabs" aria-hidden="true">
           {coverTabs.map((tab) => <span key={tab}>{tab}</span>)}

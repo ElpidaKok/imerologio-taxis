@@ -2156,8 +2156,7 @@
   pointer-events: none;
 }
 
-.notebook-binding span,
-.cover-spiral span {
+.notebook-binding span {
   width: 34px;
   height: 12px;
   flex: 0 0 12px;
@@ -2168,8 +2167,7 @@
   transform: rotate(-2deg);
 }
 
-.notebook-binding span:nth-child(even),
-.cover-spiral span:nth-child(even) {
+.notebook-binding span:nth-child(even) {
   transform: rotate(2deg);
 }
 
@@ -2653,9 +2651,9 @@
   position: absolute;
   top: 24px;
   bottom: 24px;
-  left: -28px;
+  left: -24px;
   z-index: 5;
-  width: 54px;
+  width: 44px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2663,11 +2661,61 @@
   pointer-events: none;
 }
 
+.cover-spiral::before {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  bottom: 4px;
+  width: 3px;
+  content: '';
+  background: linear-gradient(90deg, #3e4547, #9ba1a2 55%, #555d5f);
+  border-radius: 3px;
+  box-shadow: 1px 0 rgba(255, 255, 255, 0.55);
+}
+
 .cover-spiral span {
-  width: 52px;
-  height: 14px;
-  flex-basis: 14px;
-  border-width: 3px;
+  position: relative;
+  z-index: 1;
+  width: 44px;
+  height: 12px;
+  flex: 0 0 12px;
+  border: 2px solid #555d60;
+  border-top-color: #c9cfd0;
+  border-bottom-color: #454c4e;
+  border-left-color: #9ca2a4;
+  border-right-color: #353c3e;
+  border-radius: 50%;
+  box-shadow: 0 2px 2px rgba(44, 49, 51, 0.22), inset 0 1px rgba(255, 255, 255, 0.92);
+  transform: rotate(-1deg);
+}
+
+.cover-spiral span:nth-child(even) {
+  transform: rotate(1deg);
+}
+
+.cover-spiral span::before {
+  position: absolute;
+  top: -1px;
+  right: 9px;
+  left: 7px;
+  height: 1px;
+  content: '';
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 50%;
+}
+
+.cover-spiral span::after {
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 8px;
+  height: 5px;
+  content: '';
+  background: #495052;
+  border: 1px solid #343a3c;
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 1px rgba(20, 24, 25, 0.45), 1px 0 rgba(255, 255, 255, 0.45);
+  transform: translateY(-50%);
 }
 
 .cover-tabs {
@@ -3203,12 +3251,13 @@
     padding: 32px 25px 28px 34px;
   }
   .cover-spiral {
-    top: 32px;
-    bottom: 32px;
-    left: -23px;
-    width: 43px;
+    top: 27px;
+    bottom: 27px;
+    left: -20px;
+    width: 38px;
   }
-  .cover-spiral span { width: 41px; height: 13px; flex-basis: 13px; border-width: 3px; }
+  .cover-spiral span { width: 40px; height: 11px; flex-basis: 11px; }
+  .cover-spiral span::after { width: 7px; height: 4px; }
   .cover-tabs { top: 39px; gap: 3px; }
   .cover-tabs span { width: 31px; height: 43px; font-size: 6px; }
   .cover-script { margin-top: 34px; font-size: 23px; }
