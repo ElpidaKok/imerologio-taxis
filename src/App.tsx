@@ -146,7 +146,7 @@ function App() {
             <button
               key={id}
               type="button"
-              className={activeView === id ? 'active' : ''}
+              className={`nav-item nav-${id}${activeView === id ? ' active' : ''}`}
               aria-label={label}
               title={label}
               onClick={() => setActiveView(id)}
@@ -208,7 +208,7 @@ function App() {
           <button
             key={id}
             type="button"
-            className={activeView === id || (id === 'more' && ['organization', 'history', 'settings'].includes(activeView)) ? 'active' : ''}
+            className={`nav-item nav-${id}${activeView === id || (id === 'more' && ['organization', 'history', 'settings'].includes(activeView)) ? ' active' : ''}`}
             aria-label={label}
             onClick={() => setActiveView(id)}
           >

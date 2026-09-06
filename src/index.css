@@ -1,27 +1,33 @@
 :root {
   font-family: "Trebuchet MS", Candara, sans-serif;
-  color: #202724;
-  background: #eef1ed;
+  color: #303142;
+  background: #e9e5ef;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --ink: #202724;
-  --muted: #66706c;
-  --soft: #8d9692;
-  --line: #dce2de;
-  --surface: #ffffff;
-  --canvas: #f1f4f1;
-  --forest: #173d38;
-  --forest-2: #24645c;
-  --coral: #d95f47;
+  --ink: #303142;
+  --muted: #68697b;
+  --soft: #9493a3;
+  --line: #dedce8;
+  --surface: #fffefc;
+  --canvas: #f7f4f8;
+  --forest: #55469a;
+  --forest-2: #6c5bb3;
+  --coral: #df746d;
   --coral-soft: #fff0ec;
-  --gold: #ca922b;
-  --gold-soft: #fff8e8;
-  --blue: #3f68a8;
+  --gold: #d9a640;
+  --gold-soft: #fff6df;
+  --blue: #5279c7;
   --blue-soft: #edf3ff;
-  --green: #24816f;
-  --green-soft: #eaf8f4;
-  --shadow: 0 10px 28px rgba(25, 45, 39, 0.08);
+  --green: #47a690;
+  --green-soft: #e9f8f3;
+  --lavender: #8c78c4;
+  --lavender-soft: #f0ecfa;
+  --rose: #d985a6;
+  --rose-soft: #fbeef3;
+  --paper: #fffdf8;
+  --shadow: 0 12px 30px rgba(72, 66, 98, 0.1);
+  --font-hand: "Segoe Print", "Bradley Hand", cursive;
 }
 
 * {
@@ -30,7 +36,7 @@
 
 html {
   min-width: 320px;
-  background: #eef1ed;
+  background: #e9e5ef;
 }
 
 body {
